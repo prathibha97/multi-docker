@@ -6,6 +6,9 @@ services:
       - POSTGRES_PASSWORD=postgres_password
   redis:
     image: "redis:latest"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
   nginx:
     restart: always
     build:
