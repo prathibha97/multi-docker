@@ -1,33 +1,45 @@
-sudo: required
-services:
-  - docker
-
-before_install:
-  - docker build -t prathibha97/react-test -f ./client/Dockerfile.dev ./client
-
-script:
-  - docker run -e CI=true prathibha97/react-test npm test
-
-after_success:
-  - docker build -t prathibha97/multi-client ./client
-  - docker build -t prathibha97/multi-nginx ./nginx
-  - docker build -t prathibha97/multi-server ./server
-  - docker build -t prathibha97/multi-worker ./worker
-
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  - docker push prathibha97/multi-client
-  - docker push prathibha97/multi-nginx
-  - docker push prathibha97/multi-server
-  - docker push prathibha97/multi-worker
-
-deploy:
-  provider: elasticbeanstalk
-  region: 'us-east-2'
-  app:  'multi-docker'
-  env: 'MultiDocker-env-1'
-  bucket_name: 'elasticbeanstalk-us-east-2-256214816823'
-  bucket_path: 'docker-multi'
-  on:
-    branch: master
-  access_key_id: $AWS_ACCESS_KEY
-  secret_access_key: $AWS_SECRET_KEY
+[
+  {
+    "os": "linux",
+    "language": "ruby",
+    "dist": "xenial",
+    "sudo": true,
+    "services": [
+      "docker"
+    ],
+    "before_install": [
+      "docker build -t prathibha97/react-test -f ./client/Dockerfile.dev ./client"
+    ],
+    "script": [
+      "docker run -e CI=true prathibha97/react-test npm test"
+    ],
+    "after_success": [
+      "docker build -t prathibha97/multi-client ./client",
+      "docker build -t prathibha97/multi-nginx ./nginx",
+      "docker build -t prathibha97/multi-server ./server",
+      "docker build -t prathibha97/multi-worker ./worker",
+      "echo \"$DOCKER_PASSWORD\" | docker login -u \"$DOCKER_ID\" --password-stdin",
+      "docker push prathibha97/multi-client",
+      "docker push prathibha97/multi-nginx",
+      "docker push prathibha97/multi-server",
+      "docker push prathibha97/multi-worker"
+    ],
+    "deploy": [
+      {
+        "provider": "elasticbeanstalk",
+        "region": "us-east-2",
+        "app": "multi-docker",
+        "env": "MultiDocker-env-1",
+        "bucket_path": "docker-multi",
+        "on": {
+          "branch": [
+            "master"
+          ]
+        },
+        "access_key_id": "$AWS_ACCESS_KEY",
+        "secret_access_key": "$AWS_SECRET_KEY",
+        "bucket": "elasticbeanstalk-us-east-2-256214816823"
+      }
+    ]
+  }
+]
